@@ -4,6 +4,7 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const { analyzeComplaint } = require('./aiService');
 const { findOrCreateIncident } = require('./incidentMergeService');
+const { calculatePriority, getRecommendedAction, getPriorityLabel } = require('./priorityService');
 
 const app = express();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -67,7 +68,55 @@ app.get('/api/incidents', async (req, res) => {
         const incidents = await pool.query(
             `SELECT * FROM incidents ORDER BY created_at DESC`
         );
-        res.json(incidents.rows);
+
+        // Enrich each incident with priority scoring
+        const enriched = await Promise.all(incidents.rows.map(async (incident) => {
+            // Aggregate AI evidence confidence from all linked complaints
+            const confResult = await pool.query(
+                `SELECT AVG(ai_evidence_confidence) AS avg_confidence
+                 FROM complaints
+                 WHERE incident_id = $1`,
+                [incident.id]
+            );
+            const evidenceConfidence = confResult.rows[0].avg_confidence
+                ? parseFloat(confResult.rows[0].avg_confidence)
+                : 70; // default when no complaints exist yet
+
+            // Derive safety impact from issue type
+            const safetyImpact = getSafetyImpact(incident.issue_type);
+
+            // Calculate composite priority score (0-100)
+            const priority_score = calculatePriority({
+                severity:           incident.severity,
+                reportCount:        incident.report_count || 0,
+                safetyImpact,
+                evidenceConfidence,
+            });
+
+            // Human-readable recommended action
+            const recommended_action = getRecommendedAction(incident.issue_type);
+
+            // Persist scores back to the incidents table
+            await pool.query(
+                `UPDATE incidents
+                 SET priority_score = $1, recommended_action = $2
+                 WHERE id = $3`,
+                [priority_score, recommended_action, incident.id]
+            );
+
+            // Attach label/color for API consumers (not stored in DB)
+            const { label: priority_label, color: priority_color } = getPriorityLabel(priority_score);
+
+            return {
+                ...incident,
+                priority_score,
+                recommended_action,
+                priority_label,
+                priority_color,
+            };
+        }));
+
+        res.json(enriched);
     } catch (error) {
         console.error("Fetch incidents error:", error);
         res.status(500).json({ error: "Failed to fetch incidents" });
@@ -80,20 +129,79 @@ app.get('/api/incidents/:id', async (req, res) => {
         const { id } = req.params;
         const incident = await pool.query(`SELECT * FROM incidents WHERE id = $1`, [id]);
         const complaints = await pool.query(`SELECT * FROM complaints WHERE incident_id = $1`, [id]);
-        
+
         if (incident.rows.length === 0) {
             return res.status(404).json({ error: "Incident not found" });
         }
 
+        const incidentRow = incident.rows[0];
+
+        // Compute average evidence confidence from linked complaints
+        const totalConfidence = complaints.rows.reduce(
+            (sum, c) => sum + (parseFloat(c.ai_evidence_confidence) || 0),
+            0
+        );
+        const evidenceConfidence = complaints.rows.length > 0
+            ? totalConfidence / complaints.rows.length
+            : 70; // default when no complaints exist yet
+
+        // Derive safety impact from issue type
+        const safetyImpact = getSafetyImpact(incidentRow.issue_type);
+
+        // Calculate composite priority score (0-100)
+        const priority_score = calculatePriority({
+            severity:           incidentRow.severity,
+            reportCount:        incidentRow.report_count || 0,
+            safetyImpact,
+            evidenceConfidence,
+        });
+
+        // Human-readable recommended action
+        const recommended_action = getRecommendedAction(incidentRow.issue_type);
+
+        // Persist scores back to the incidents table
+        await pool.query(
+            `UPDATE incidents
+             SET priority_score = $1, recommended_action = $2
+             WHERE id = $3`,
+            [priority_score, recommended_action, incidentRow.id]
+        );
+
+        // Attach label/color for API consumers (not stored in DB)
+        const { label: priority_label, color: priority_color } = getPriorityLabel(priority_score);
+
         res.json({
-            incident: incident.rows[0],
-            evidence_reports: complaints.rows
+            incident: {
+                ...incidentRow,
+                priority_score,
+                recommended_action,
+                priority_label,
+                priority_color,
+            },
+            evidence_reports: complaints.rows,
         });
     } catch (error) {
         console.error("Fetch incident details error:", error);
         res.status(500).json({ error: "Failed to fetch incident details" });
     }
 });
+
+// =============================================================
+// Helper: derive a 0-100 safety impact score from the issue type.
+// Higher numbers indicate greater public-safety risk.
+// Used by the GET /api/incidents handlers above.
+// =============================================================
+function getSafetyImpact(issueType) {
+    const map = {
+        waterlogging: 90, // flood/drowning risk
+        drainage:     80, // structural collapse, health hazard
+        road_damage:  70, // accident risk
+        pothole:      60, // vehicle/pedestrian injury
+        streetlight:  50, // night-time safety
+        garbage:      30, // health nuisance, lower immediate danger
+    };
+    return map[(issueType || '').toLowerCase()] ?? 40; // default medium-low
+}
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server listening on port ${PORT}`));
