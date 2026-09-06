@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-outline-variant: #424754;
+  --color-surface-container: #1d2022;
+  --color-on-error-container: #ffdad6;
+  --color-on-background: #e0e3e5;
+  --color-outline: #8c909f;
+  --color-tertiary-fixed-dim: #c1c6db;
+  --color-secondary: #5de6ff;
+  --color-surface-bright: #363a3b;
+  --color-secondary-container: #00cbe6;
+  --color-secondary-fixed: #a2eeff;
+  --color-surface: #101415;
+  --color-on-primary-fixed: #001a42;
+  --color-on-surface-variant: #c2c6d6;
+  --color-surface-container-lowest: #0b0f10;
+  --color-on-tertiary-container: #242939;
+  --color-primary-fixed-dim: #adc6ff;
+  --color-primary: #adc6ff;
+  --color-on-secondary-fixed: #001f25;
+  --color-inverse-on-surface: #2d3133;
+  --color-on-tertiary: #2a3040;
+  --color-primary-fixed: #d8e2f8;
+  --color-error-container: #93000a;
+  --color-surface-container-low: #191c1e;
+  --color-surface-dim: #101415;
+  --color-tertiary: #c1c6db;
+  --color-on-surface: #e0e3e5;
+  --color-surface-container-highest: #323537;
+  --color-on-primary: #002e6a;
+  --color-tertiary-fixed: #dde2f8;
+  --color-inverse-surface: #e0e3e5;
+  --color-surface-container-high: #272a2c;
+  --color-surface-tint: #adc6ff;
+  --color-on-primary-fixed-variant: #004395;
+  --color-on-primary-container: #00285d;
+  --color-error: #ffb4ab;
+  --color-on-tertiary-fixed: #151b2b;
+  --color-surface-variant: #323537;
+  --color-secondary-fixed-dim: #2fd9f4;
+  --color-inverse-primary: #005ac2;
+  --color-on-error: #690005;
+  --color-background: #101415;
+  --color-on-tertiary-fixed-variant: #414658;
+  --color-on-secondary: #00363e;
+  --color-on-secondary-fixed-variant: #004e5a;
+  --color-on-secondary-container: #00515d;
+  --color-primary-container: #4d8eff;
+  --color-tertiary-container: #8b90a4;
+
+  --spacing-unit: 8px;
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 16px;
+  --spacing-container-max: 1440px;
+  --spacing-margin-desktop: 40px;
+}
+
+@layer base {
+  * {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display, .font-headline {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+  }
+}
+
+/* Smooth Theme Transitions */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 0.5px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+html.dark .glass-panel,
+.dark .glass-panel {
+  background: rgba(0, 0, 0, 0.2);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 0.5px solid rgba(140, 144, 159, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+html.dark .glass-card,
+.dark .glass-card {
+  background: rgba(16, 20, 21, 0.7);
+  border: 0.5px solid rgba(140, 144, 159, 0.1);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+html.dark .glass-card:hover,
+.dark .glass-card:hover {
+  background: rgba(16, 20, 21, 0.85);
+  border-color: rgba(93, 230, 255, 0.3);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.glow-critical {
+  box-shadow: 0 0 40px -10px rgba(255, 180, 171, 0.2);
+}
+html.dark .glow-critical,
+.dark .glow-critical {
+  box-shadow: 0 0 40px -10px rgba(255, 180, 171, 0.15);
+}
+
+.glow-primary {
+  box-shadow: 0 0 30px -5px rgba(173, 198, 255, 0.3);
+}
+html.dark .glow-primary,
+.dark .glow-primary {
+  box-shadow: 0 0 30px -5px rgba(173, 198, 255, 0.2);
+}
+
+.ai-gradient {
+  background: linear-gradient(135deg, #4d8eff 0%, #00cbe6 100%);
+}
+
+/* Ambient animated background */
+.ambient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background: #f0f2f5;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+}
+
+html.dark .ambient-bg,
+.dark .ambient-bg {
+  background: #0b0f10;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  animation: float 20s infinite ease-in-out alternate;
+}
+
+/* Map Marker Pulse */
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+.marker-pulse::before {
+  content: '';
+  position: absolute;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  border-radius: 50%;
+  background: inherit;
+  animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  z-index: -1;
+}
+
+#shader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  opacity: 0.03;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+html.dark #shader-container,
+.dark #shader-container {
+  opacity: 0.15;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -50px) scale(1.1); }
+  100% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+/* Material Symbols configuration */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
