@@ -1,0 +1,6 @@
+{
+  "name": "UrbanEye AI",
+  "description": "UrbanEye transforms citizen complaints into AI-powered infrastructure intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

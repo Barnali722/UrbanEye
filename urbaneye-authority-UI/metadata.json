@@ -1,0 +1,6 @@
+{
+  "name": "UrbanEye Command Center",
+  "description": "Know what needs attention. Act where it matters most.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
