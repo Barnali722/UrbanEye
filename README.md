@@ -4,7 +4,7 @@
 
 [![Citizen Portal](https://img.shields.io/badge/Citizen%20Portal-Live-000000?style=for-the-badge\&logo=vercel)](https://urbaneye-ai-citizen-ui.vercel.app/)
 [![Authority Dashboard](https://img.shields.io/badge/Authority%20Dashboard-Live-000000?style=for-the-badge\&logo=vercel)](https://urbaneye-authority-ui.vercel.app/)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge\&logo=github)](https://github.com/aftabhossain0080-stack/UrbanEye)
+
 
 ## 👥 Team
 
