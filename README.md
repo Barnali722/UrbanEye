@@ -19,7 +19,7 @@
 * **Puranjay Singh Bisht**
 * **Samiha Chowdhuri**
 
-Built with ❤️ by **Tech Titans** using React, Node.js, PostgreSQL, and AI.
+Built with ❤️ by **Tech Titans** using React, TypeScript, Node.js, PostgreSQL, and AI.
 
 --------
 
