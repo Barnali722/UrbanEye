@@ -14,8 +14,8 @@
 
 **Team Members:**
 
-* **Md Aftab Hossain**
 * **Barnali Tanti**
+* **Md Aftab Hossain**
 * **Puranjay Singh Bisht**
 * **Samiha Chowdhuri**
 
